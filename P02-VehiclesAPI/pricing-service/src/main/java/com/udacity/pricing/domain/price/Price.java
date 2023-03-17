@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 public class Price {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long vehicleId;
     private String currency;
     private BigDecimal price;
