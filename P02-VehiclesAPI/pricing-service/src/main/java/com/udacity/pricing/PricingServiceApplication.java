@@ -2,12 +2,11 @@ package com.udacity.pricing;
 
 import com.udacity.pricing.domain.price.Price;
 import com.udacity.pricing.domain.price.PriceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,18 +20,14 @@ import java.util.stream.LongStream;
  * TODO: Convert the application from a REST API to a microservice.
  */
 @SpringBootApplication
+@EnableDiscoveryClient
 public class PricingServiceApplication implements CommandLineRunner{
 
     @Autowired
     PriceRepository priceRepository;
 
-    private static final Logger logger = LoggerFactory.getLogger(PricingServiceApplication.class);
-
     public static void main(String[] args) {
-        logger.info("STARTING APPLICATION");
         SpringApplication.run(PricingServiceApplication.class, args);
-        logger.info("APPLICATION FINISHED");
-
     }
 
 
@@ -62,8 +57,6 @@ public class PricingServiceApplication implements CommandLineRunner{
             System.out.println("key = " + entry.getKey() + ", value = " + entry.getValue());
         }
 
-        logger.info("EXECUTING : command line runner");
         priceRepository.saveAll(PRICES.values());
-        logger.info("hello");
     }
 }
