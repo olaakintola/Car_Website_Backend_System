@@ -1,15 +1,18 @@
 package com.udacity.pricing;
 
 import com.udacity.pricing.domain.price.Price;
+import com.udacity.pricing.domain.price.PriceClient;
 import com.udacity.pricing.domain.price.PriceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -21,10 +24,14 @@ import java.util.stream.LongStream;
  */
 @SpringBootApplication
 @EnableDiscoveryClient
+@EnableFeignClients
 public class PricingServiceApplication implements CommandLineRunner{
 
     @Autowired
     PriceRepository priceRepository;
+
+    @Autowired
+    PriceClient priceClient;
 
     public static void main(String[] args) {
         SpringApplication.run(PricingServiceApplication.class, args);
@@ -58,5 +65,10 @@ public class PricingServiceApplication implements CommandLineRunner{
         }
 
         priceRepository.saveAll(PRICES.values());
+
+//        priceClient.findPriceByVehicleId(1L);
+//
+//        System.out.println(price.get(0).toString());
+
     }
 }

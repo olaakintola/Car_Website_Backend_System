@@ -50,4 +50,8 @@ public class Price {
     public void setVehicleId(Long vehicleId) {
         this.vehicleId = vehicleId;
     }
+
+    public String toString(){
+        return "" + vehicleId.toString() + currency + price;
+    }
 }
