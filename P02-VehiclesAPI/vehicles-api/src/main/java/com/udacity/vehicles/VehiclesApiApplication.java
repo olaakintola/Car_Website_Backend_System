@@ -1,5 +1,7 @@
 package com.udacity.vehicles;
 
+import com.udacity.vehicles.domain.car.Car;
+import com.udacity.vehicles.domain.car.CarRepository;
 import com.udacity.vehicles.domain.manufacturer.Manufacturer;
 import com.udacity.vehicles.domain.manufacturer.ManufacturerRepository;
 import org.modelmapper.ModelMapper;
@@ -10,6 +12,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import java.time.LocalDateTime;
+import java.time.Month;
 
 /**
  * Launches a Spring Boot application for the Vehicles API,
@@ -37,6 +42,7 @@ public class VehiclesApiApplication {
             repository.save(new Manufacturer(102, "Ford"));
             repository.save(new Manufacturer(103, "BMW"));
             repository.save(new Manufacturer(104, "Dodge"));
+
         };
     }
 

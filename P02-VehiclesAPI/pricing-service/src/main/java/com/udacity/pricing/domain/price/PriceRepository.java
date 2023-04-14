@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 
-@RepositoryRestResource(collectionResourceRel = "vehicle-price", path = "vehicle-price")
+@RepositoryRestResource(collectionResourceRel = "price", path = "price")
 public interface PriceRepository extends CrudRepository<Price, Long> {
+
+//    @RequestMapping(method = RequestMethod.GET, value = "/{vehicleId}")
+//    List<Price> findPriceByVehicleId(@PathVariable("vehicleId") Long vehicleId);
 
 }
