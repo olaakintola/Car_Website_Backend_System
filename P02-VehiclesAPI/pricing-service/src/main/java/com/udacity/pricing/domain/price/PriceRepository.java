@@ -2,6 +2,7 @@ package com.udacity.pricing.domain.price;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,9 @@ import java.util.List;
 public interface PriceRepository extends CrudRepository<Price, Long> {
 
 //    @RequestMapping(method = RequestMethod.GET, value = "/{vehicleId}")
-//    List<Price> findPriceByVehicleId(@PathVariable("vehicleId") Long vehicleId);
+//    Price findPriceByVehicleId(@PathVariable("vehicleId") Long vehicleId);
+
+//    @RequestMapping(method = RequestMethod.GET)
+    Price findPriceByVehicleId(@Param("vehicleId") Long vehicleId);
 
 }

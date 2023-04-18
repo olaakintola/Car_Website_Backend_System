@@ -1,7 +1,6 @@
 package com.udacity.pricing;
 
 import com.udacity.pricing.domain.price.Price;
-import com.udacity.pricing.domain.price.PriceClient;
 import com.udacity.pricing.domain.price.PriceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -29,9 +28,6 @@ public class PricingServiceApplication implements CommandLineRunner{
 
     @Autowired
     PriceRepository priceRepository;
-
-    @Autowired
-    PriceClient priceClient;
 
     public static void main(String[] args) {
         SpringApplication.run(PricingServiceApplication.class, args);
@@ -65,10 +61,6 @@ public class PricingServiceApplication implements CommandLineRunner{
         }
 
         priceRepository.saveAll(PRICES.values());
-
-//        priceClient.findPriceByVehicleId(1L);
-//
-//        System.out.println(price.get(0).toString());
 
     }
 }

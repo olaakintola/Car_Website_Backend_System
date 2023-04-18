@@ -1,15 +1,19 @@
 package com.udacity.vehicles.service;
 
 import com.udacity.vehicles.client.maps.Address;
+import com.udacity.vehicles.client.maps.MapsClient;
 import com.udacity.vehicles.client.prices.Price;
 import com.udacity.vehicles.client.prices.PriceClient;
+import com.udacity.vehicles.domain.Location;
 import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
+
+import org.modelmapper.ModelMapper;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,24 +26,25 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class CarService {
 
-    private static final Logger log = LoggerFactory.getLogger(PriceClient.class);
+//    private static final Logger log = LoggerFactory.getLogger(CarService.class);
+    private static final Logger logger = Logger.getLogger("MyLogB");
+
 
     private final CarRepository repository;
+    private final MapsClient mapsClient;
 
-    private final WebClient mapsClient;
-
-    private final WebClient pricingClient;
-
+    private final PriceClient priceClient;
 
 
-    public CarService(CarRepository repository, WebClient maps, WebClient pricing) {
+
+    public CarService(CarRepository repository, MapsClient mapsClient, PriceClient priceClient) {
         /**
          * TODO: Add the Maps and Pricing Web Clients you create
          *   in `VehiclesApiApplication` as arguments and set them here.
          */
         this.repository = repository;
-        this.mapsClient = maps;
-        this.pricingClient = pricing;
+        this.mapsClient = mapsClient;
+        this.priceClient = priceClient;
     }
 
     /**
@@ -62,6 +67,9 @@ public class CarService {
          *   Remove the below code as part of your implementation.
          */
 
+        logger.info("HELLO");
+        System.out.println("hello");
+
         Optional<Car> optionalCar = repository.findById(id);
         Car car = optionalCar.orElseThrow(CarNotFoundException::new);
 
@@ -73,23 +81,11 @@ public class CarService {
          *   the pricing service each time to get the price.
          */
 
-        try {
-            Price price = pricingClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("services/price/")
-                            .queryParam("vehicleId", car.getId())
-                            .build()
-                    )
-                    .retrieve().bodyToMono(Price.class).block();
+        logger.info("price1");
+        System.out.println("car id " + car.getId() );
 
-            String carPrice = String.format("%s %s", price.getCurrency(), price.getPrice());
-            car.setPrice(carPrice);
-
-        } catch (Exception e) {
-            log.error("Unexpected error retrieving price for vehicle {}", car.getId(), e);
-        }
-
+        String price = priceClient.getPrice(car.getId());
+        car.setPrice(price);
 
         /**
          * TODO: Use the Maps Web client you create in `VehiclesApiApplication`
@@ -100,25 +96,16 @@ public class CarService {
          * meaning the Maps service needs to be called each time for the address.
          */
 
-        try {
-            Address address = mapsClient
-                    .get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/maps/")
-                            .queryParam("lat", car.getLocation().getLat())
-                            .queryParam("lon", car.getLocation().getLon())
-                            .build()
-                    )
-                    .retrieve().bodyToMono(Address.class).block();
+        System.out.println(""+ car.getLocation().getLon());
+        System.out.println(""+ car.getLocation().getAddress());
 
-            car.getLocation().setAddress(address.getAddress());
-            car.getLocation().setCity(address.getCity());
-            car.getLocation().setState(address.getState());
-            car.getLocation().setZip(address.getZip());
+        Location newLocation = mapsClient.getAddress(car.getLocation());
 
-        } catch (Exception e) {
-            log.warn("Map service is down");
-        }
+        car.getLocation().setAddress(newLocation.getAddress());
+        car.getLocation().setCity(newLocation.getCity());
+        car.getLocation().setState(newLocation.getState());
+        car.getLocation().setZip(newLocation.getZip());
+
 
         return car;
     }
