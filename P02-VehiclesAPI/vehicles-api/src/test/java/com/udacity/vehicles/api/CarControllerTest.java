@@ -4,8 +4,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,6 +23,7 @@ import com.udacity.vehicles.domain.car.Details;
 import com.udacity.vehicles.domain.manufacturer.Manufacturer;
 import com.udacity.vehicles.service.CarService;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +37,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 /**
  * Implements testing of the CarController class.
@@ -58,6 +63,9 @@ public class CarControllerTest {
     @MockBean
     private MapsClient mapsClient;
 
+    private MediaType contentType = new MediaType("application", "hal+json", Charset.forName("UTF-8"));
+
+
     /**
      * Creates pre-requisites for testing, such as an example car.
      */
@@ -77,12 +85,13 @@ public class CarControllerTest {
     @Test
     public void createCar() throws Exception {
         Car car = getCar();
-        mvc.perform(
+        final ResultActions result = mvc.perform(
                 post(new URI("/cars"))
                         .content(json.write(car).getJson())
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .accept(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(status().isCreated());
+                        .accept(MediaType.APPLICATION_JSON_UTF8));
+        result.andExpect(status().isCreated());
+        verifyJson(result, car);
     }
 
     /**
@@ -97,6 +106,14 @@ public class CarControllerTest {
          *   below (the vehicle will be the first in the list).
          */
 
+        Car car = getCar();
+        mvc.perform(
+                get(new URI("/cars")))
+                .andExpect(content().contentType(contentType))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._embedded.carList[0].details.body").value(car.getDetails().getBody()))
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/cars"));
+
     }
 
     /**
@@ -109,6 +126,13 @@ public class CarControllerTest {
          * TODO: Add a test to check that the `get` method works by calling
          *   a vehicle by ID. This should utilize the car from `getCar()` below.
          */
+
+        Car car = getCar();
+        Long carId = Long.valueOf(1);
+        final ResultActions result = mvc.perform(get(new URI("/cars"+"/"+carId)));
+        result.andExpect(status().isOk());
+        verifyJson(result, car);
+
     }
 
     /**
@@ -122,6 +146,25 @@ public class CarControllerTest {
          *   when the `delete` method is called from the Car Controller. This
          *   should utilize the car from `getCar()` below.
          */
+
+        Long carId = Long.valueOf(1);
+        mvc.perform(delete("/cars"+"/"+carId))
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    public void updateCar() throws Exception{
+        Car car = getCar();
+        Long carId = Long.valueOf(1);
+        final ResultActions result = mvc.perform(put(new URI("/cars"+"/"+carId))
+                .content(json.write(car).getJson())
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .accept(MediaType.APPLICATION_JSON_UTF8));
+
+        result.andExpect(status().isOk());
+        verifyJson(result, car);
+
     }
 
     /**
@@ -146,5 +189,25 @@ public class CarControllerTest {
         car.setDetails(details);
         car.setCondition(Condition.USED);
         return car;
+    }
+
+    private void verifyJson(final ResultActions action, Car car) throws Exception {
+        action
+                .andExpect(jsonPath("$.details.body").value( car.getDetails().getBody()))
+                .andExpect(jsonPath("$.details.model").value( car.getDetails().getModel()))
+                .andExpect(jsonPath("$.details.manufacturer.code").value( car.getDetails().getManufacturer().getCode()))
+                .andExpect(jsonPath("$.details.manufacturer.name").value( car.getDetails().getManufacturer().getName()))
+                .andExpect(jsonPath("$.details.numberOfDoors").value( car.getDetails().getNumberOfDoors()))
+                .andExpect(jsonPath("$.details.fuelType").value( car.getDetails().getFuelType()))
+                .andExpect(jsonPath("$.details.engine").value( car.getDetails().getEngine()))
+                .andExpect(jsonPath("$.details.mileage").value( car.getDetails().getMileage()))
+                .andExpect(jsonPath("$.details.modelYear").value( car.getDetails().getModelYear()))
+                .andExpect(jsonPath("$.details.productionYear").value( car.getDetails().getProductionYear()))
+                .andExpect(jsonPath("$.details.externalColor").value( car.getDetails().getExternalColor()))
+                .andExpect(jsonPath("$.location.lat").value( car.getLocation().getLat()))
+                .andExpect(jsonPath("$.location.lon").value( car.getLocation().getLon()))
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/cars/1"))
+                .andExpect(jsonPath("$._links.cars.href").value( "http://localhost/cars"));
+
     }
 }
