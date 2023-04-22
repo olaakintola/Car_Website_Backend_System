@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.udacity.vehicles.client.maps.MapsClient;
+import com.udacity.vehicles.client.prices.Price;
 import com.udacity.vehicles.client.prices.PriceClient;
 import com.udacity.vehicles.domain.Condition;
 import com.udacity.vehicles.domain.Location;
@@ -22,12 +22,17 @@ import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.Details;
 import com.udacity.vehicles.domain.manufacturer.Manufacturer;
 import com.udacity.vehicles.service.CarService;
+
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
+
+import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,6 +43,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * Implements testing of the CarController class.
@@ -73,9 +79,24 @@ public class CarControllerTest {
     public void setup() {
         Car car = getCar();
         car.setId(1L);
+        Location updatedLocation = getFullLocation(car.getLocation());
+        given(mapsClient.getAddress(any())).willReturn(updatedLocation);
+        car.setLocation(updatedLocation);
+        String carPrice = "USD 17572.98";
+        given(priceClient.getPrice(any())).willReturn(carPrice);
+        car.setPrice(carPrice);
         given(carService.save(any())).willReturn(car);
         given(carService.findById(any())).willReturn(car);
         given(carService.list()).willReturn(Collections.singletonList(car));
+    }
+
+    private Location getFullLocation(Location updatedLocation) {
+        updatedLocation.setAddress("420 Koriko Boulevard");
+        updatedLocation.setCity("Atlanta");
+        updatedLocation.setState("Georgia");
+        updatedLocation.setZip("21876");
+
+        return updatedLocation;
     }
 
     /**
@@ -85,6 +106,7 @@ public class CarControllerTest {
     @Test
     public void createCar() throws Exception {
         Car car = getCar();
+
         final ResultActions result = mvc.perform(
                 post(new URI("/cars"))
                         .content(json.write(car).getJson())
@@ -128,10 +150,36 @@ public class CarControllerTest {
          */
 
         Car car = getCar();
+        Location updatedLocation = getFullLocation(car.getLocation());
+        car.setLocation(updatedLocation);
+        String carPrice = "USD 17572.98";
+        given(priceClient.getPrice(any())).willReturn(carPrice);
+        car.setPrice(carPrice);
+
         Long carId = Long.valueOf(1);
         final ResultActions result = mvc.perform(get(new URI("/cars"+"/"+carId)));
         result.andExpect(status().isOk());
-        verifyJson(result, car);
+        result
+                .andExpect(jsonPath("$.details.body").value( car.getDetails().getBody()))
+                .andExpect(jsonPath("$.details.model").value( car.getDetails().getModel()))
+                .andExpect(jsonPath("$.details.manufacturer.code").value( car.getDetails().getManufacturer().getCode()))
+                .andExpect(jsonPath("$.details.manufacturer.name").value( car.getDetails().getManufacturer().getName()))
+                .andExpect(jsonPath("$.details.numberOfDoors").value( car.getDetails().getNumberOfDoors()))
+                .andExpect(jsonPath("$.details.fuelType").value( car.getDetails().getFuelType()))
+                .andExpect(jsonPath("$.details.engine").value( car.getDetails().getEngine()))
+                .andExpect(jsonPath("$.details.mileage").value( car.getDetails().getMileage()))
+                .andExpect(jsonPath("$.details.modelYear").value( car.getDetails().getModelYear()))
+                .andExpect(jsonPath("$.details.productionYear").value( car.getDetails().getProductionYear()))
+                .andExpect(jsonPath("$.details.externalColor").value( car.getDetails().getExternalColor()))
+                .andExpect(jsonPath("$.location.lat").value( car.getLocation().getLat()))
+                .andExpect(jsonPath("$.location.lon").value( car.getLocation().getLon()))
+                .andExpect(jsonPath("$.location.address").value( car.getLocation().getAddress()))
+                .andExpect(jsonPath("$.location.city").value( car.getLocation().getCity()))
+                .andExpect(jsonPath("$.location.state").value( car.getLocation().getState()))
+                .andExpect(jsonPath("$.location.zip").value( car.getLocation().getZip()))
+                .andExpect(jsonPath("$.price").value( car.getPrice()))
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/cars/1"))
+                .andExpect(jsonPath("$._links.cars.href").value( "http://localhost/cars"));
 
     }
 
@@ -156,6 +204,7 @@ public class CarControllerTest {
     @Test
     public void updateCar() throws Exception{
         Car car = getCar();
+
         Long carId = Long.valueOf(1);
         final ResultActions result = mvc.perform(put(new URI("/cars"+"/"+carId))
                 .content(json.write(car).getJson())
@@ -210,4 +259,5 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$._links.cars.href").value( "http://localhost/cars"));
 
     }
+
 }
