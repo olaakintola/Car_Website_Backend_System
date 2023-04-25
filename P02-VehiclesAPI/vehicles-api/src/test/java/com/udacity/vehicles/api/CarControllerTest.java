@@ -2,6 +2,7 @@ package com.udacity.vehicles.api;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -26,7 +27,12 @@ import com.udacity.vehicles.service.CarService;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Collections;
+import java.util.Locale;
 
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.Before;
@@ -71,6 +77,7 @@ public class CarControllerTest {
 
     private MediaType contentType = new MediaType("application", "hal+json", Charset.forName("UTF-8"));
 
+    private static String BASE_PATH = "http://localhost/cars";
 
     /**
      * Creates pre-requisites for testing, such as an example car.
@@ -134,7 +141,9 @@ public class CarControllerTest {
                 .andExpect(content().contentType(contentType))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.carList[0].details.body").value(car.getDetails().getBody()))
-                .andExpect(jsonPath("$._links.self.href").value("http://localhost/cars"));
+                .andExpect(jsonPath("$._embedded.carList[0]._links.self.href").value(BASE_PATH + "/1"))
+                .andExpect(jsonPath("$._embedded.carList[0]._links.cars.href").value(BASE_PATH))
+                .andExpect(jsonPath("$._links.self.href").value(BASE_PATH));
 
     }
 
@@ -159,6 +168,7 @@ public class CarControllerTest {
         Long carId = Long.valueOf(1);
         final ResultActions result = mvc.perform(get(new URI("/cars"+"/"+carId)));
         result.andExpect(status().isOk());
+
         result
                 .andExpect(jsonPath("$.details.body").value( car.getDetails().getBody()))
                 .andExpect(jsonPath("$.details.model").value( car.getDetails().getModel()))
@@ -178,8 +188,8 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$.location.state").value( car.getLocation().getState()))
                 .andExpect(jsonPath("$.location.zip").value( car.getLocation().getZip()))
                 .andExpect(jsonPath("$.price").value( car.getPrice()))
-                .andExpect(jsonPath("$._links.self.href").value("http://localhost/cars/1"))
-                .andExpect(jsonPath("$._links.cars.href").value( "http://localhost/cars"));
+                .andExpect(jsonPath("$._links.self.href").value(BASE_PATH + "/1"))
+                .andExpect(jsonPath("$._links.cars.href").value( BASE_PATH));
 
     }
 
@@ -255,9 +265,8 @@ public class CarControllerTest {
                 .andExpect(jsonPath("$.details.externalColor").value( car.getDetails().getExternalColor()))
                 .andExpect(jsonPath("$.location.lat").value( car.getLocation().getLat()))
                 .andExpect(jsonPath("$.location.lon").value( car.getLocation().getLon()))
-                .andExpect(jsonPath("$._links.self.href").value("http://localhost/cars/1"))
-                .andExpect(jsonPath("$._links.cars.href").value( "http://localhost/cars"));
-
+                .andExpect(jsonPath("$._links.self.href").value(BASE_PATH + "/1"))
+                .andExpect(jsonPath("$._links.cars.href").value( BASE_PATH));
     }
 
 }
