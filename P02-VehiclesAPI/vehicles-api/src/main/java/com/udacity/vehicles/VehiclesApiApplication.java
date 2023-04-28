@@ -4,6 +4,10 @@ import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
 import com.udacity.vehicles.domain.manufacturer.Manufacturer;
 import com.udacity.vehicles.domain.manufacturer.ManufacturerRepository;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +27,9 @@ import java.time.Month;
  */
 @SpringBootApplication
 @EnableJpaAuditing
+@OpenAPIDefinition(info = @Info( title = "Vehicles API", version = "1.0", description = "This is a Vehicle API server created using springdocs - a library for OpenAPI 3 with spring boot.",
+        license = @License(name = "Apache 2.0", url = "http://foo.bar"),
+        contact = @Contact(url = "https://ie.linkedin.com/in/olanipekun-akintola-6746731b7", name = "OllaOla", email = "ola@gmail.com") ) )
 public class VehiclesApiApplication {
 
     public static void main(String[] args) {
