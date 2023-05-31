@@ -1,6 +1,5 @@
 package com.udacity.vehicles.service;
 
-import com.udacity.vehicles.client.maps.Address;
 import com.udacity.vehicles.client.maps.MapsClient;
 import com.udacity.vehicles.client.prices.Price;
 import com.udacity.vehicles.client.prices.PriceClient;
@@ -8,15 +7,12 @@ import com.udacity.vehicles.domain.Location;
 import com.udacity.vehicles.domain.car.Car;
 import com.udacity.vehicles.domain.car.CarRepository;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
 
 
-import org.modelmapper.ModelMapper;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 /**
  * Implements the car service create, read, update or delete
@@ -32,7 +28,6 @@ public class CarService {
 
     private final CarRepository repository;
     private final MapsClient mapsClient;
-
     private final PriceClient priceClient;
 
 
@@ -45,6 +40,7 @@ public class CarService {
         this.repository = repository;
         this.mapsClient = mapsClient;
         this.priceClient = priceClient;
+
     }
 
     /**
@@ -148,5 +144,10 @@ public class CarService {
 
         repository.delete(car);
 
+        Mono<Price> newPrice = priceClient.createPrice(id);
+        System.out.println("NEW PRICE " + newPrice.block().getPrice() );
+
+        String afterPrice = priceClient.getPrice(id);
+        System.out.println("AFTER PRICE " + afterPrice );
     }
 }

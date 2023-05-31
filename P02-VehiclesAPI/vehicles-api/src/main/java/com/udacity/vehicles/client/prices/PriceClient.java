@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 /**
  * Implements a class to interface with the Pricing Client for price data.
@@ -14,6 +15,7 @@ public class PriceClient {
     private static final Logger log = LoggerFactory.getLogger(PriceClient.class);
 
     private final WebClient client;
+
 
     public PriceClient(WebClient pricing) {
         this.client = pricing;
@@ -50,4 +52,26 @@ public class PriceClient {
         }
         return "(consult price)";
     }
+
+
+    public Mono<Price> createPrice(Long vehicleId) {
+
+        try {
+            Mono<Price> price = client
+                    .get()
+                    .uri("services/generatePrice/replacementPrice/"+ vehicleId)
+                    .retrieve().bodyToMono(Price.class);
+
+            System.out.println("(no error)");
+            return price;
+
+        } catch (Exception e) {
+            log.error("Unexpected error retrieving price for vehicle {}", vehicleId, e);
+        }
+
+        System.out.println("(consult price)");
+        return null;
+    }
+
+
 }
