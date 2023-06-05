@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="eurekaserver" />
         <module name="vehicles-api" />
+        <module name="order-service" />
         <module name="pricing-service" />
         <module name="boogle-maps" />
       </profile>
@@ -15,6 +16,7 @@
     <bytecodeTargetLevel>
       <module name="boogle-maps" target="11" />
       <module name="eurekaserver" target="11" />
+      <module name="order-service" target="11" />
       <module name="pricing-service" target="11" />
       <module name="vehicles-api" target="11" />
     </bytecodeTargetLevel>
@@ -23,6 +25,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="boogle-maps" options="-parameters" />
       <module name="eurekaserver" options="-parameters" />
+      <module name="order-service" options="-parameters" />
       <module name="pricing-service" options="-parameters" />
       <module name="vehicles-api" options="-parameters" />
     </option>
