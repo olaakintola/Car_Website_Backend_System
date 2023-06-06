@@ -52,12 +52,13 @@ public class OrderController {
      * @throws URISyntaxException if the request contains invalid fields or syntax
      */
     @PostMapping
-    public ResponseEntity<Order> post(@Valid @RequestBody Order order) throws URISyntaxException {
+    public ResponseEntity post(@Valid @RequestBody Order order) throws URISyntaxException {
         /**
          * TODO: Use the `save` method from the Order Service to save the input order.
          */
         Order savedOrder = orderService.save(order);
-        return new ResponseEntity<Order>(savedOrder, HttpStatus.CREATED);
+//        return new ResponseEntity<Order>(savedOrder, HttpStatus.CREATED);
+        return ResponseEntity.created(new URI("/orders/" + savedOrder.getOrderId())).body(savedOrder);
     }
 
 
