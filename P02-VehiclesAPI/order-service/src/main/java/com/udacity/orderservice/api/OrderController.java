@@ -61,4 +61,22 @@ public class OrderController {
     }
 
 
+    /**
+     * Updates the information of a order in the system.
+     * @param id The ID number for which to update order information.
+     * @param order The updated information about the related vehicle.
+     * @return response that the order was updated in the system
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> put(@PathVariable Long id, @Valid @RequestBody Order order) {
+        /**
+         * TODO: Set the id of the input order object to the `id` input.
+         * TODO: Save the order using the `save` method from the Order service
+         */
+        order.setOrderId(id);
+        Order updatedOrder = orderService.save(order);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
+
 }
