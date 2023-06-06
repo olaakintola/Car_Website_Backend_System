@@ -78,5 +78,19 @@ public class OrderController {
         return ResponseEntity.ok(updatedOrder);
     }
 
+    /**
+     * Removes an order from the system.
+     * @param id The ID number of the order to remove.
+     * @return response that the related order is no longer in the system
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        /**
+         * TODO: Use the Order Service to delete the requested vehicle.
+         */
+        orderService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }

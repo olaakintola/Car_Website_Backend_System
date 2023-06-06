@@ -61,4 +61,23 @@ public class OrderService {
     public List<Order> list() {
         return orderRepository.findAll();
     }
+
+    /**
+     * Deletes a given order by ID
+     * @param id the ID number of the order to delete
+     */
+    public void delete(Long id) {
+        /**
+         * TODO: Find the order by ID from the `repository` if it exists.
+         *   If it does not exist, throw a OrderNotFoundException
+         */
+
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        Order order = optionalOrder.orElseThrow(OrderNotFoundException::new);
+
+        /**
+         * TODO: Delete the order from the repository.
+         */
+        orderRepository.delete(order);
+    }
 }
