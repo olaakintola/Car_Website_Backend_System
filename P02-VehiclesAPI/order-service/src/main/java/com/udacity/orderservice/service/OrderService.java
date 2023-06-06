@@ -4,6 +4,9 @@ import com.udacity.orderservice.domain.order.Order;
 import com.udacity.orderservice.domain.order.OrderRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class OrderService {
 
@@ -33,5 +36,29 @@ public class OrderService {
 
         return orderRepository.save(order);
 
+    }
+
+    /**
+     * Gets order information by ID (or throws exception if non-existent)
+     * @param id the ID number of the order to gather information on
+     * @return the requested order's information
+     */
+    public Order findById(Long id) {
+        /**
+         * TODO: Find the order by ID from the `orderRepository` if it exists.
+         *   If it does not exist, throw a OrderNotFoundException
+         */
+        Optional<Order> optionalOrder = orderRepository.findById(id);
+        Order car = optionalOrder.orElseThrow(OrderNotFoundException::new);
+
+        return car;
+    }
+
+    /**
+     * Gathers a list of all orders
+     * @return a list of all orders in the OrderRepository
+     */
+    public List<Order> list() {
+        return orderRepository.findAll();
     }
 }

@@ -4,14 +4,13 @@ import com.udacity.orderservice.domain.order.Order;
 import com.udacity.orderservice.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
@@ -23,6 +22,28 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    /**
+     * Creates a list to store any orders.
+     * @return list of orders
+     */
+    @GetMapping
+    public List<Order> getOrders() {
+        return orderService.list();
+    }
+
+    /**
+     * Gets information of a specific order by ID.
+     * @param id the id number of the given order
+     * @return all information for the requested order
+     */
+    @GetMapping("/{id}")
+    public Order getOrderDetails(@PathVariable Long id) {
+        /**
+         * TODO: Use the `findById` method from the Order Service to get order information.
+         */
+        return orderService.findById(id);
+    }
+
 
     /**
      * Posts information to create a new order in the system.
@@ -31,14 +52,11 @@ public class OrderController {
      * @throws URISyntaxException if the request contains invalid fields or syntax
      */
     @PostMapping
-    ResponseEntity<Order> post(@Valid @RequestBody Order order) throws URISyntaxException {
+    public ResponseEntity<Order> post(@Valid @RequestBody Order order) throws URISyntaxException {
         /**
          * TODO: Use the `save` method from the Order Service to save the input order.
          */
-
         Order savedOrder = orderService.save(order);
-//        Order savedOrder = new Order(1, "PENDING", "DEBIT");
-
         return new ResponseEntity<Order>(savedOrder, HttpStatus.CREATED);
     }
 
