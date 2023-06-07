@@ -2,7 +2,6 @@ package com.udacity.orderservice.api;
 
 import com.udacity.orderservice.domain.order.Order;
 import com.udacity.orderservice.service.OrderService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,7 +9,6 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/orders")
@@ -44,7 +42,6 @@ public class OrderController {
         return orderService.findById(id);
     }
 
-
     /**
      * Posts information to create a new order in the system.
      * @param order A new vehicle to add to the system.
@@ -57,10 +54,8 @@ public class OrderController {
          * TODO: Use the `save` method from the Order Service to save the input order.
          */
         Order savedOrder = orderService.save(order);
-//        return new ResponseEntity<Order>(savedOrder, HttpStatus.CREATED);
         return ResponseEntity.created(new URI("/orders/" + savedOrder.getOrderId())).body(savedOrder);
     }
-
 
     /**
      * Updates the information of a order in the system.
@@ -92,6 +87,5 @@ public class OrderController {
         orderService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 
 }

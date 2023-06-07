@@ -1,9 +1,14 @@
 package com.udacity.orderservice.service;
 
+import com.udacity.orderservice.client.VehiclesClient;
+import com.udacity.orderservice.domain.car.Car;
 import com.udacity.orderservice.domain.order.Order;
 import com.udacity.orderservice.domain.order.OrderRepository;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,8 +17,11 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public OrderService(OrderRepository orderRepository){
+    private final VehiclesClient vehiclesClient;
+
+    public OrderService(OrderRepository orderRepository, VehiclesClient vehiclesClient){
         this.orderRepository = orderRepository;
+        this.vehiclesClient = vehiclesClient;
     }
 
 
@@ -34,6 +42,18 @@ public class OrderService {
                     }).orElseThrow(OrderNotFoundException::new);
         }
 
+        Mono<Car> car = vehiclesClient.getCarPrice(order.getCar().getId() );
+        String price = car.block().getPrice();
+
+        System.out.println("is price still the same"+ price);
+        System.out.println("shoudl be string"+order.getCar().getPrice() );
+        order.getCar().setPrice( price );
+        System.out.println("string should not be the answer now"+order.getCar().getPrice() );
+
+        String[] splittedPrice = price.split(" ");
+        Double vat = 0.1 * Double.valueOf( splittedPrice[1] );
+        Double invoiceAmount = vat + Double.valueOf(splittedPrice[1]);
+        order.setInvoiceAmount(new BigDecimal(invoiceAmount ).setScale(2, RoundingMode.HALF_UP) );
         return orderRepository.save(order);
 
     }
@@ -71,7 +91,6 @@ public class OrderService {
          * TODO: Find the order by ID from the `repository` if it exists.
          *   If it does not exist, throw a OrderNotFoundException
          */
-
         Optional<Order> optionalOrder = orderRepository.findById(id);
         Order order = optionalOrder.orElseThrow(OrderNotFoundException::new);
 

@@ -31,7 +31,6 @@ public class Car {
     @Embedded
     private Location location = new Location(0d, 0d);
 
-    @Transient
     private String price;
 
     public Long getId() {
