@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,6 +27,7 @@ import java.time.Month;
  * and launches web clients to communicate with maps and pricing.
  */
 @SpringBootApplication
+@EnableDiscoveryClient
 @EnableJpaAuditing
 @OpenAPIDefinition(info = @Info( title = "Vehicles API", version = "1.0", description = "This is a Vehicle API server created using springdocs - a library for OpenAPI 3 with spring boot.",
         license = @License(name = "Apache 2.0", url = "http://foo.bar"),
