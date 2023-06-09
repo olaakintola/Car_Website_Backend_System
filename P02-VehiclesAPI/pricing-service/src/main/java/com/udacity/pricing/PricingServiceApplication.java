@@ -2,6 +2,10 @@ package com.udacity.pricing;
 
 import com.udacity.pricing.domain.price.Price;
 import com.udacity.pricing.domain.price.PriceRepository;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -24,6 +28,9 @@ import java.util.stream.LongStream;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
+@OpenAPIDefinition(info = @Info( title = "Pricing API", version = "1.0", description = "This is a Pricing API server created using springdocs - a library for OpenAPI 3 with spring boot.",
+        license = @License(name = "Apache 2.0", url = "http://foo.bar"),
+        contact = @Contact(url = "https://ie.linkedin.com/in/olanipekun-akintola-6746731b7", name = "OllaOla", email = "ola@gmail.com") ) )
 public class PricingServiceApplication implements CommandLineRunner{
 
     @Autowired
